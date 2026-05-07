@@ -1,1 +1,593 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Calculadora de Tarifas · AVANZAR</title>
+<meta name="theme-color" content="#7c3aed"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-title" content="AVANZAR"/>
+<style>
+:root {
+  --bg: #0a0812;
+  --surface: rgba(255,255,255,0.04);
+  --surface2: rgba(255,255,255,0.07);
+  --border: rgba(255,255,255,0.09);
+  --border2: rgba(255,255,255,0.15);
+  --purple: #7c3aed;
+  --purple-light: #a855f7;
+  --purple-glow: rgba(124,58,237,0.35);
+  --indigo: #4f46e5;
+  --text: #f1f0f5;
+  --text-muted: rgba(255,255,255,0.45);
+  --text-dim: rgba(255,255,255,0.25);
+  --gold: #f59e0b;
+  --green: #10b981;
+  --red: #ef4444;
+  --radius: 14px;
+  --radius-sm: 8px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 14px;
+  min-height: 100vh;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 20% 10%, rgba(124,58,237,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(79,70,229,0.08) 0%, transparent 60%);
+}
+.header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(10,8,18,0.9);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 24px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.header-brand { display: flex; align-items: center; gap: 12px; }
+.header-icon {
+  width: 38px; height: 38px; border-radius: 10px;
+  background: linear-gradient(135deg, var(--purple), var(--indigo));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 19px; box-shadow: 0 4px 16px var(--purple-glow);
+}
+.header-title { font-weight: 700; font-size: 15px; letter-spacing: -0.3px; }
+.header-sub { color: var(--text-muted); font-size: 11px; margin-top: 1px; }
+.header-badge {
+  padding: 4px 10px; border-radius: 20px;
+  background: rgba(124,58,237,0.15); border: 1px solid rgba(124,58,237,0.3);
+  color: #c084fc; font-size: 11px; font-weight: 600; letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+.main { max-width: 700px; margin: 0 auto; padding: 24px 16px 60px; }
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 22px;
+  margin-bottom: 14px;
+}
+.card-title {
+  font-size: 10px; font-weight: 700; letter-spacing: 1.8px;
+  text-transform: uppercase; color: var(--text-muted);
+  margin-bottom: 18px;
+}
+.field { margin-bottom: 18px; }
+.field:last-child { margin-bottom: 0; }
+.label { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.6); margin-bottom: 8px; display: block; }
+.label span { color: var(--text-dim); font-weight: 400; margin-left: 4px; }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip {
+  padding: 8px 14px; border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border2);
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: 13px; font-family: inherit;
+  cursor: pointer; transition: all .18s; white-space: nowrap;
+  outline: none;
+}
+.chip:hover { border-color: rgba(168,85,247,0.4); color: rgba(255,255,255,0.75); }
+.chip.active {
+  border-color: var(--purple-light);
+  background: rgba(168,85,247,0.18);
+  color: #c084fc; font-weight: 600;
+}
+select {
+  width: 100%; padding: 12px 40px 12px 14px;
+  background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: var(--radius-sm); color: var(--text);
+  font-size: 14px; font-family: inherit;
+  outline: none; cursor: pointer; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff55' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center;
+  transition: border-color .18s;
+}
+select:focus { border-color: var(--purple-light); }
+select option { background: #1a1530; color: var(--text); }
+.input-wrap { position: relative; }
+.input-prefix {
+  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  color: var(--text-muted); font-size: 14px; font-weight: 600; pointer-events: none;
+}
+input[type=text] {
+  width: 100%; padding: 12px 14px 12px 28px;
+  background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: var(--radius-sm); color: var(--text);
+  font-size: 15px; font-weight: 600; font-family: inherit;
+  outline: none; transition: border-color .18s;
+}
+input[type=text]:focus { border-color: var(--purple-light); }
+input[type=text].error { border-color: var(--red); background: rgba(239,68,68,0.08); }
+.input-hint { font-size: 11px; color: var(--text-dim); margin-top: 4px; }
+.input-hint.err { color: #f87171; }
+.result-card {
+  background: rgba(124,58,237,0.07);
+  border: 1px solid rgba(124,58,237,0.22);
+  border-radius: 18px; padding: 22px; margin-bottom: 14px;
+  animation: fadeUp .3s ease;
+}
+.result-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; flex-wrap: wrap; gap: 10px; }
+.result-tabla-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); }
+.result-tabla-name { font-weight: 700; font-size: 15px; color: #c084fc; margin-top: 3px; }
+.result-nota { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+.iva-toggle {
+  padding: 6px 14px; border-radius: 20px; cursor: pointer;
+  border: 1.5px solid var(--border2);
+  background: var(--surface); color: var(--text-muted);
+  font-size: 12px; font-weight: 700; font-family: inherit;
+  transition: all .18s; white-space: nowrap;
+}
+.iva-toggle.active { border-color: var(--purple-light); background: rgba(168,85,247,0.18); color: #c084fc; }
+.desglose { display: grid; gap: 8px; margin-bottom: 18px; }
+.desglose-line {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 12px; background: rgba(255,255,255,0.03);
+  border-radius: var(--radius-sm); border: 1px solid transparent; gap: 10px;
+}
+.desglose-line.accent { border-color: rgba(168,85,247,0.2); }
+.desglose-line.warning { border-color: rgba(245,158,11,0.25); background: rgba(245,158,11,0.05); }
+.desglose-lbl { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.7); }
+.desglose-lbl.accent { color: #c084fc; }
+.desglose-lbl.warning { color: var(--gold); }
+.desglose-sub { font-size: 10px; color: var(--text-dim); margin-top: 2px; }
+.desglose-val { font-size: 14px; font-weight: 700; color: rgba(255,255,255,0.85); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.desglose-val.accent { color: #c084fc; }
+.desglose-val.warning { color: var(--gold); }
+.divider { height: 1px; background: rgba(255,255,255,0.08); margin: 14px 0; }
+.total-row { display: flex; justify-content: space-between; align-items: center; }
+.total-lbl { font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.7); }
+.total-lbl small { font-size: 10px; color: #a78bfa; margin-left: 5px; font-weight: 400; }
+.total-val {
+  font-size: 28px; font-weight: 800; letter-spacing: -0.5px;
+  background: linear-gradient(90deg, #c084fc, #818cf8);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.fin-card {
+  background: rgba(79,70,229,0.07);
+  border: 1px solid rgba(79,70,229,0.22);
+  border-radius: 18px; padding: 22px; margin-bottom: 14px;
+}
+.slider-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.slider-val { font-size: 22px; font-weight: 700; color: #818cf8; }
+input[type=range] {
+  width: 100%; height: 4px; border-radius: 4px;
+  background: rgba(255,255,255,0.1); outline: none; cursor: pointer;
+  -webkit-appearance: none; appearance: none;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%;
+  background: #818cf8; cursor: pointer; box-shadow: 0 0 10px rgba(129,140,248,0.5);
+}
+.slider-ticks { display: flex; justify-content: space-between; margin-top: 6px; }
+.tick { font-size: 10px; color: var(--text-dim); cursor: pointer; transition: color .15s; padding: 2px; }
+.tick.active { color: #818cf8; font-weight: 700; }
+.anticipo-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.anticipo-min { font-size: 11px; color: var(--text-dim); }
+.cuotas { display: grid; gap: 6px; margin-top: 16px; }
+.cuota-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 9px 14px; border-radius: var(--radius-sm);
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+}
+.cuota-row.anticipo { background: rgba(129,140,248,0.1); border-color: rgba(129,140,248,0.28); }
+.cuota-lbl { font-size: 13px; color: rgba(255,255,255,0.55); }
+.cuota-lbl.anticipo { color: #a5b4fc; font-weight: 600; }
+.cuota-val { font-size: 14px; font-weight: 700; color: rgba(255,255,255,0.8); font-variant-numeric: tabular-nums; }
+.cuota-val.anticipo { color: #c7d2fe; }
+.fin-total { display: flex; justify-content: space-between; align-items: center; }
+.fin-total-lbl { font-size: 13px; color: var(--text-muted); }
+.fin-total-val { font-size: 16px; font-weight: 700; color: #818cf8; }
+.info-box {
+  background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.2);
+  border-radius: var(--radius-sm); padding: 10px 14px;
+  font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 10px; line-height: 1.6;
+}
+.error-card {
+  background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.28);
+  border-radius: 14px; padding: 18px 20px; color: #f87171; font-weight: 600;
+  animation: fadeUp .3s ease;
+}
+.copy-btn {
+  padding: 8px 18px; border-radius: 8px; cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.6);
+  font-size: 12px; font-weight: 600; font-family: inherit;
+  transition: all .18s; white-space: nowrap;
+}
+.copy-btn:hover { background: rgba(255,255,255,0.1); }
+.copy-btn.ok { background: rgba(16,185,129,0.15); color: #4ade80; border-color: rgba(16,185,129,0.3); }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+</style>
+</head>
+<body>
 
+<header class="header">
+  <div class="header-brand">
+    <div class="header-icon">⚖️</div>
+    <div>
+      <div class="header-title">Calculadora de Tarifas</div>
+      <div class="header-sub">AVANZAR · Insolvencia Persona Natural</div>
+    </div>
+  </div>
+  <div class="header-badge">Ley 2445 / 2025</div>
+</header>
+
+<main class="main">
+  <div class="card">
+    <div class="card-title">Datos del caso</div>
+    <div class="field">
+      <label class="label">Ocupación del cliente</label>
+      <div class="chips">
+        <button class="chip active" data-group="ocupacion" data-val="civil">👤 Civil</button>
+        <button class="chip" data-group="ocupacion" data-val="militar">🎖️ Militar / Policía / FF.MM. / Pensionado</button>
+      </div>
+    </div>
+    <div class="field">
+      <label class="label">¿Tiene patrimonio?</label>
+      <div class="chips">
+        <button class="chip active" data-group="patrimonio" data-val="si">✅ Sí tiene patrimonio</button>
+        <button class="chip" data-group="patrimonio" data-val="no">❌ Sin patrimonio</button>
+      </div>
+    </div>
+    <div class="field">
+      <label class="label">Objetivo del proceso</label>
+      <div class="chips">
+        <button class="chip active" data-group="objetivo" data-val="acuerdo">🤝 Acuerdo</button>
+        <button class="chip" data-group="objetivo" data-val="bilateral">↔️ Bilateral</button>
+        <button class="chip" data-group="objetivo" data-val="liquidacion">🏠 Liquidación</button>
+      </div>
+    </div>
+    <div class="field">
+      <label class="label">Ciudad</label>
+      <select id="select-ciudad">
+        <option value="">— Selecciona una ciudad —</option>
+      </select>
+    </div>
+    <div class="field">
+      <label class="label">Total de deudas <span>(pasivo)</span></label>
+      <div class="input-wrap">
+        <span class="input-prefix">$</span>
+        <input type="text" id="input-deuda" inputmode="numeric" placeholder="0" autocomplete="off"/>
+      </div>
+      <div class="input-hint" id="hint-deuda"></div>
+    </div>
+  </div>
+  <div id="resultado-container"></div>
+</main>
+
+<script>
+const CIUDADES_LP2445 = ["Bogotá","Medellín","Barranquilla","Santa Marta","Sincelejo","Valledupar","Neiva","Pamplona","Cúcuta","Ocaña","Tunja","Envigado","Bello","Bucaramanga"];
+const CIUDADES_MILITARES = ["Bogotá","Medellín","Barranquilla","Santa Marta","Sincelejo","Valledupar","Neiva","Montería","Ibagué","Pamplona","Cúcuta","Ocaña","Tunja","Envigado","Bello","Rionegro","Riohacha"];
+const CIUDAD_GRUPO = {"Bogotá":1,"Medellín":1,"Barranquilla":1,"Santa Marta":1,"Sincelejo":1,"Valledupar":1,"Neiva":1,"Montería":1,"Ibagué":1,"Pamplona":1,"Cúcuta":1,"Ocaña":1,"Tunja":1,"Envigado":1,"Bello":1,"Rionegro":1,"Riohacha":1,"San Gil":1,"Socorro":2,"Piedecuesta":2,"Armenia":2,"Barbosa":2,"Manizales":2,"Cali":3,"Villavicencio":3,"Arauca":4,"Itagüi":5,"Bucaramanga":6,"Pereira":6,"Pasto":7,"Cartagena":8,"Barrancabermeja":9};
+
+const T_MIL = [[1,1000000,292402,17598,450000],[1000000,10000000,848230,21770,450000],[10000000,20000000,1168900,31100,900000],[20000000,40000000,1489570,55730,1161000],[40000000,60000000,1489570,205130,1742400],[60000000,80000000,1489570,205130,1742400],[80000000,100000000,1489570,840530,2820600],[100000000,120000000,2024020,836180,3334500],[120000000,140000000,2024020,1471580,3832200],[140000000,160000000,2024020,1630880,3832200],[160000000,180000000,2024020,2184380,4778100],[180000000,200000000,2024020,2184380,4778100],[200000000,220000000,2772250,1989650,5657400],[220000000,240000000,2772250,1989650,5657400],[240000000,260000000,2772250,2524250,6470100],[260000000,280000000,2772250,2524250,6470100],[280000000,300000000,2772250,3198350,7217100],[300000000,320000000,4475600,1495000,7217100],[320000000,340000000,4475600,1976500,7897500],[340000000,360000000,4475600,1976500,7897500],[360000000,380000000,4475600,2458000,8511300],[380000000,400000000,4475600,2458000,8511300],[400000000,420000000,4475600,2939500,9058500],[420000000,Infinity,4575600,2839500,9058500]];
+const T_LP = [[1,1000000,1703350,396650,5000000,7100000],[1000000,10000000,1703350,396650,5000000,7100000],[10000000,20000000,1703350,396650,5380000,7480000],[20000000,40000000,1703350,396650,5690000,7790000],[40000000,60000000,1703350,396650,6400000,8500000],[60000000,80000000,2024020,225980,6400000,8650000],[80000000,100000000,2024020,225980,7720000,9970000],[100000000,120000000,2237800,662200,8350000,11250000],[120000000,140000000,2237800,662200,8960000,11860000],[140000000,160000000,2237800,662200,8960000,11860000],[160000000,180000000,2237800,662200,10110000,13010000],[180000000,200000000,2237800,662200,10110000,13010000],[200000000,220000000,2558470,521530,11190000,14270000],[220000000,240000000,2558470,521530,11190000,14270000],[240000000,260000000,2558470,521530,12180000,15260000],[260000000,280000000,2558470,521530,12180000,15260000],[280000000,300000000,2558470,521530,13100000,16180000],[300000000,320000000,2872250,627750,13100000,16600000],[320000000,340000000,2872250,627750,13920000,17420000],[340000000,360000000,2872250,627750,13920000,17420000],[360000000,380000000,2872250,627750,14670000,18170000],[380000000,400000000,2872250,627750,14670000,18170000],[400000000,Infinity,2972250,527750,15350000,18850000]];
+const T_GRUPOS = {
+  1:[[1,1000000,292402,5598,550000],[1000000,10000000,848230,21770,550000],[10000000,20000000,1168900,31100,1100000],[20000000,40000000,1703350,185350,1419000],[40000000,60000000,1703350,367950,2129600],[60000000,80000000,1703350,367950,2129600],[80000000,100000000,1703350,1144550,3447400],[100000000,120000000,2451580,1044220,4075500],[120000000,140000000,2451580,1820820,4683800],[140000000,160000000,2451580,2015520,4683800],[160000000,180000000,2451580,2692020,5839900],[180000000,200000000,2451580,2692020,5839900],[200000000,220000000,3841150,1978950,6914600],[220000000,240000000,3841150,1978950,6914600],[240000000,260000000,3841150,2632350,7907900],[260000000,280000000,3841150,2632350,7907900],[280000000,300000000,3841150,3456250,8820900],[300000000,320000000,6078950,1218450,8820900],[320000000,340000000,6078950,1806950,9652500],[340000000,360000000,6078950,1806950,9652500],[360000000,380000000,6078950,2395450,10402700],[380000000,400000000,6078950,2395450,10402700],[400000000,Infinity,6178950,2883950,11071500]],
+  2:[[1,1000000,292402,64260,550000],[1000000,10000000,848230,149900,550000],[10000000,20000000,1168900,257000,1100000],[20000000,40000000,1443427,348689,1419000],[40000000,60000000,2249485,617903,2129600],[60000000,80000000,3055899,887235,2129600],[80000000,100000000,3861598,1156329,3447400],[100000000,120000000,4667655,1425543,4075500],[120000000,140000000,5473712,1694756,4683800],[140000000,160000000,6279768,1963970,4683800],[160000000,180000000,6968416,2193970,5839900],[180000000,200000000,7760926,2458659,5839900],[200000000,220000000,8264429,2626823,6914600],[220000000,240000000,8405545,2673954,6914600],[240000000,260000000,9117449,2911722,7907900],[260000000,280000000,9644209,3087653,7907900],[280000000,300000000,10342565,3320896,8820900],[300000000,320000000,10928682,3383253,8820900],[320000000,340000000,11173209,3464923,9652500],[340000000,360000000,11538588,3586955,9652500],[360000000,380000000,12237114,3820254,10402700],[380000000,400000000,12881959,4035625,10402700],[400000000,Infinity,13738795,4188399,11071500]],
+  3:[[1,1000000,292402,64260,550000],[1000000,10000000,848230,149900,550000],[10000000,20000000,1168900,257000,1100000],[20000000,40000000,1313904,305430,1419000],[40000000,60000000,2042247,548688,2129600],[60000000,80000000,2770589,791945,2129600],[80000000,100000000,3498932,1035203,3447400],[100000000,120000000,4227275,1278461,4075500],[120000000,140000000,4567168,1391981,4683800],[140000000,160000000,5125564,1578479,4683800],[160000000,180000000,5654826,1755246,5839900],[180000000,200000000,7140645,2251492,5839900],[200000000,220000000,7558228,2390960,6914600],[220000000,240000000,7917544,2510967,6914600],[240000000,260000000,8403105,2673139,7907900],[260000000,280000000,8859533,2825581,7907900],[280000000,300000000,9286828,2968292,8820900],[300000000,320000000,9784988,3001273,8820900],[320000000,340000000,10154015,3124524,9652500],[340000000,360000000,10493908,3238044,9652500],[360000000,380000000,10804668,3341834,10402700],[380000000,400000000,11086294,3435894,10402700],[400000000,Infinity,11079470,3300216,11071500]],
+  4:[[1,1000000,192402,64260,550000],[1000000,10000000,748230,249900,550000],[10000000,20000000,1068900,357000,1100000],[20000000,40000000,1699466,567602,1419000],[40000000,60000000,2719146,908163,2129600],[60000000,80000000,3738825,1248724,2129600],[80000000,100000000,4758505,1589285,3447400],[100000000,120000000,5778184,1929846,4075500],[120000000,140000000,6797864,2270406,4683800],[140000000,160000000,7817544,2610967,4683800],[160000000,180000000,8837223,2951528,5839900],[180000000,200000000,9856903,3292089,5839900],[200000000,220000000,10876583,3632650,6914600],[220000000,240000000,11896262,3973211,6914600],[240000000,260000000,12915942,4313772,7907900],[260000000,280000000,13935621,4654333,7907900],[280000000,300000000,14955301,4994894,8820900],[300000000,320000000,15974981,5335455,8820900],[320000000,340000000,16994660,5676016,9652500],[340000000,360000000,18014340,6016577,9652500],[360000000,380000000,19034019,6357138,10402700],[380000000,400000000,20053699,6697699,10402700],[400000000,Infinity,20393592,6811219,11071500]],
+  5:[[1,1000000,192402,64260,550000],[1000000,10000000,748230,249900,550000],[10000000,20000000,1068900,357000,1100000],[20000000,40000000,1038617,346886,1419000],[40000000,60000000,1965554,656472,2129600],[60000000,80000000,2702637,902649,2129600],[80000000,100000000,3439720,1148826,3447400],[100000000,120000000,4176802,1395003,4075500],[120000000,140000000,4913885,1641180,4683800],[140000000,160000000,5885473,1965679,4683800],[160000000,180000000,6682666,2231932,5839900],[180000000,200000000,7225623,2413273,5839900],[200000000,220000000,7740319,2585175,6914600],[220000000,240000000,8395827,2804107,6914600],[240000000,260000000,9051335,3023039,7907900],[260000000,280000000,9706843,3241971,7907900],[280000000,300000000,10362352,3460903,8820900],[300000000,320000000,11017860,3679835,8820900],[320000000,340000000,11673369,3898768,9652500],[340000000,360000000,12328878,4117700,9652500],[360000000,380000000,12440556,4154999,10402700],[380000000,400000000,13066931,4364201,10402700],[400000000,Infinity,13275722,4433935,11071500]],
+  6:[[1,36000000,1710240,571200,1419000],[36000001,80000000,1710240,571200,2129600],[80000001,99999999,1710240,571200,3447400],[100000000,120000000,2672250,892500,4075500],[120000001,160000000,2672250,892500,4683800],[160000001,200000000,2672250,892500,5839900],[200000001,240000000,2672250,892500,6914600],[240000001,280000000,2672250,892500,7907900],[280000001,299999999,2672250,892500,8820900],[300000000,320000000,4061820,1356600,8820900],[320000001,360000000,4061820,1356600,9652500],[360000001,999999999,6520290,2177700,11071500],[1000000000,Infinity,7482300,2499000,11071500]],
+  7:[[1,1000000,192402,64260,550000],[1000000,10000000,748230,249900,550000],[10000000,20000000,1068900,357000,1100000],[20000000,40000000,1389570,464100,1419000],[40000000,60000000,2030910,678300,2129600],[60000000,80000000,2030910,678300,2129600],[80000000,100000000,2672250,892500,3447400],[100000000,120000000,3206700,1071000,4075500],[120000000,140000000,3848040,1285200,4683800],[140000000,160000000,3848040,1285200,4683800],[160000000,180000000,4382490,1463700,5839900],[180000000,200000000,4382490,1463700,5839900],[200000000,220000000,4916940,1642200,6914600],[220000000,240000000,4916940,1642200,6914600],[240000000,260000000,5451390,1820700,7907900],[260000000,280000000,5451390,1820700,7907900],[280000000,300000000,6199620,2070600,8820900],[300000000,320000000,6199620,2070600,8820900],[320000000,340000000,6734070,2249100,9652500],[340000000,360000000,6734070,2249100,9652500],[360000000,380000000,7268520,2427600,10402700],[380000000,400000000,7268520,2427600,10402700],[400000000,Infinity,8016750,2677500,11071500]],
+  8:[[20000000,40000000,935288,312375,1419000],[40000000,60000000,1453704,485520,2129600],[60000000,80000000,1940054,647955,2129600],[80000000,100000000,2394336,799680,3447400],[100000000,120000000,2816552,940695,4075500],[120000000,140000000,3206700,1071000,4683800],[140000000,160000000,3687705,1231650,4683800],[160000000,180000000,4168710,1392300,5839900],[180000000,200000000,4649715,1552950,5839900],[200000000,220000000,5130720,1713600,6914600],[220000000,240000000,5611725,1874250,6914600],[240000000,260000000,6092730,2034900,7907900],[260000000,280000000,6573735,2195550,7907900],[280000000,300000000,7054740,2356200,8820900],[300000000,320000000,7535745,2516850,8820900],[320000000,340000000,8016750,2677500,9652500],[340000000,360000000,8497755,2838150,9652500],[360000000,380000000,8978760,2998800,10402700],[380000000,400000000,9459765,3159450,10402700],[400000000,Infinity,9620100,3213000,11071500]],
+  9:[[1,1000000,192402,64260,550000],[1000000,10000000,748230,249900,550000],[10000000,20000000,1068900,357000,1100000],[20000000,40000000,1444546,482461,1419000],[40000000,60000000,2311274,771938,2129600],[60000000,80000000,3178386,1061543,2129600],[80000000,100000000,4044729,1350892,3447400],[100000000,120000000,4911457,1640369,4075500],[120000000,140000000,5778185,1929846,4683800],[140000000,160000000,6644912,2219322,4683800],[160000000,180000000,7511640,2508799,5839900],[180000000,200000000,8378367,2798276,5839900],[200000000,220000000,9245096,3087753,6914600],[220000000,240000000,10111823,3377230,6914600],[240000000,260000000,10978550,3666706,7907900],[260000000,280000000,11845278,3956183,7907900],[280000000,300000000,12712005,4245660,8820900],[300000000,320000000,13578734,4535137,8820900],[320000000,340000000,14445461,4824614,9652500],[340000000,360000000,15312189,5114091,9652500],[360000000,380000000,16178916,5403567,10402700],[380000000,400000000,17045645,5693044,10402700],[400000000,Infinity,17334553,5789536,11071500]]
+};
+
+const state = { ocupacion:'civil', patrimonio:'si', objetivo:'acuerdo', ciudad:'', deuda:0, conIva:false, numCuotas:1, anticipoInput:'' };
+const cop = n => '$ ' + Math.round(n).toLocaleString('es-CO');
+const buscar = (t, d) => t.find(([a,b]) => d >= a && d <= b) || t[t.length-1];
+
+function maxCuotas(objetivo, tabla) {
+  if (tabla && tabla.includes('LP 2445')) return 12;
+  if (objetivo === 'acuerdo' || objetivo === 'bilateral') return 8;
+  return 12;
+}
+
+function calcular() {
+  const { ocupacion, patrimonio, objetivo, ciudad, deuda } = state;
+  if (!ciudad || deuda <= 0) return null;
+  const esMilitar = ocupacion === 'militar';
+  const esLP = CIUDADES_LP2445.includes(ciudad);
+  const grupo = CIUDAD_GRUPO[ciudad];
+  const esBilateral = objetivo === 'bilateral';
+  if (esMilitar) {
+    const enTabMil = CIUDADES_MILITARES.includes(ciudad);
+    if (patrimonio === 'no' && objetivo === 'liquidacion' && esLP) {
+      const [,,nuvakta,prosperar,lidera,totalBase] = buscar(T_LP, deuda);
+      const extra = esBilateral ? 5250000 : 0;
+      return { tabla:'Tarifas Especiales LP 2445', nuvakta, prosperar, lidera, extra, total: totalBase+extra, nota:'Militar sin patrimonio — liquidación LP 2445' };
+    }
+    if (enTabMil) {
+      const [,,nuvakta,prosperar,lidera] = buscar(T_MIL, deuda);
+      const esLiqConPat = objetivo === 'liquidacion' && patrimonio === 'si';
+      const extra = (esBilateral || esLiqConPat) ? 5250000 : 0;
+      let nota = null;
+      if (esBilateral) nota = 'Tarifas Militares — bilateral (+$5.250.000)';
+      else if (esLiqConPat) nota = 'Tarifas Militares — liquidación con patrimonio (+$5.250.000)';
+      return { tabla:'Tarifas Militares', nuvakta, prosperar, lidera, extra, total: nuvakta+prosperar+lidera+extra, nota };
+    }
+  }
+  if (patrimonio === 'no' && esLP) {
+    const [,,nuvakta,prosperar,lidera,totalBase] = buscar(T_LP, deuda);
+    const extra = esBilateral ? 5250000 : 0;
+    const nota = esBilateral ? 'Tarifa LP 2445 — bilateral (+$5.250.000)' : 'Tarifa especial LP 2445';
+    return { tabla:'Tarifas Especiales LP 2445', nuvakta, prosperar, lidera, extra, total: totalBase+extra, nota };
+  }
+  if (!grupo) return { error:'Ciudad no encontrada en las tablas.' };
+  const tg = T_GRUPOS[grupo];
+  if (!tg) return { error:'Grupo tarifario no disponible.' };
+  const fila = buscar(tg, deuda);
+  if (!fila) return { error:'Deuda fuera de rango.' };
+  const [,,nuvakta,prosperar,lidera] = fila;
+  const agregarExtra = esBilateral || objetivo === 'liquidacion' || (patrimonio === 'no' && !esLP);
+  const extra = agregarExtra ? 5250000 : 0;
+  const total = nuvakta + prosperar + lidera + extra;
+  let nota = '';
+  if (objetivo === 'acuerdo') nota = 'Acuerdo de pago';
+  else if (esBilateral) nota = 'Acuerdo bilateral (+$5.250.000)';
+  else if (objetivo === 'liquidacion') nota = 'Liquidación (+$5.250.000)';
+  else if (patrimonio === 'no') nota = 'Sin patrimonio, fuera LP2445 (+$5.250.000)';
+  return { tabla:`Grupo ${grupo}`, nuvakta, prosperar, lidera, extra, total, nota };
+}
+
+function render() {
+  const res = calcular();
+  const container = document.getElementById('resultado-container');
+  if (!res) { container.innerHTML = ''; return; }
+  if (res.error) { container.innerHTML = `<div class="error-card">⚠️ ${res.error}</div>`; return; }
+
+  const IVA = 0.19;
+  const iva = state.conIva;
+  const m = v => iva ? v * (1 + IVA) : v;
+  const nuvakta = m(res.nuvakta), prosperar = m(res.prosperar);
+  const lidera = m(res.lidera), extra = m(res.extra), total = m(res.total);
+  const lim = maxCuotas(state.objetivo, res.tabla);
+  if (state.numCuotas > lim) state.numCuotas = lim;
+  const nc = state.numCuotas;
+  const baseAnticipo = lidera + extra;
+  const minimoAnticipo = baseAnticipo * 0.2;
+  const anticipoManual = parseFloat((state.anticipoInput||'').replace(/[^0-9]/g,'')) || 0;
+  const anticipo = anticipoManual >= minimoAnticipo ? anticipoManual : minimoAnticipo;
+  const anticipoValido = anticipoManual === 0 || anticipoManual >= minimoAnticipo;
+  const restante = total - anticipo;
+  const valorCuota = nc > 1 ? restante / (nc - 1) : restante;
+
+  let cuotasHtml = `<div class="cuota-row anticipo"><span class="cuota-lbl anticipo">Anticipo (cuota 1)</span><span class="cuota-val anticipo">${cop(anticipo)}</span></div>`;
+  for (let i = 2; i <= nc; i++) cuotasHtml += `<div class="cuota-row"><span class="cuota-lbl">Cuota ${i}</span><span class="cuota-val">${cop(valorCuota)}</span></div>`;
+
+  let ticksHtml = '';
+  for (let i = 1; i <= lim; i++) ticksHtml += `<span class="tick${i===nc?' active':''}" onclick="setCuotas(${i})">${i}</span>`;
+
+  const cuotasTexto = nc === 1
+    ? `ANTICIPO ÚNICO: ${cop(anticipo)}`
+    : `ANTICIPO (CUOTA 1): ${cop(anticipo)}\n` + Array.from({length:nc-1},(_,i)=>`CUOTA ${i+2}: ${cop(valorCuota)}`).join('\n');
+
+  const resumenTexto =
+`✦ UNA DECISIÓN LO CAMBIA TODO, LA SOLUCIÓN A TUS PROBLEMAS ESTÁ AQUÍ ✦
+
+✦ AVANZAR · Propuesta Comercial
+Insolvencia Persona Natural · Ley 2445/2025
+
+💰 TOTAL${iva?' (IVA incluido)':''}: ${cop(total)}
+
+📅 PLAN DE PAGO (${nc} cuota${nc>1?'s':''}):
+${cuotasTexto}
+
+─────────────────────────────
+Expertos en insolvencia persona natural.
+Ley 2445 de 2025 · Colombia.`;
+
+  container.innerHTML = `
+    <div class="result-card">
+      <div class="result-header">
+        <div>
+          <div class="result-tabla-label">Tabla aplicada</div>
+          <div class="result-tabla-name">${res.tabla}</div>
+          ${res.nota ? `<div class="result-nota">${res.nota}</div>` : ''}
+        </div>
+        <button class="iva-toggle${iva?' active':''}" onclick="toggleIva()">${iva?'✓ Con IVA (19%)':'+ IVA (19%)'}</button>
+      </div>
+      <div class="desglose">
+        <div class="desglose-line">
+          <div><div class="desglose-lbl">Centro de Conciliación (FLM / Nuvakta)</div><div class="desglose-sub">→ "CENTRO DE CONCILIACIÓN" en el simulador</div></div>
+          <div class="desglose-val">${cop(nuvakta)}</div>
+        </div>
+        <div class="desglose-line">
+          <div><div class="desglose-lbl">Acompañamiento Jurídico (Prosperar)</div><div class="desglose-sub">→ "ACOMPAÑAMIENTO JURÍDICO" en el simulador</div></div>
+          <div class="desglose-val">${cop(prosperar)}</div>
+        </div>
+        <div class="desglose-line accent">
+          <div><div class="desglose-lbl accent">Paquete Educativo (Lidera)</div><div class="desglose-sub">→ "PAQUETE EDUCATIVO LIDERA" en el simulador</div></div>
+          <div class="desglose-val accent">${cop(lidera)}</div>
+        </div>
+        ${extra > 0 ? `<div class="desglose-line warning"><div><div class="desglose-lbl warning">Adicional bilateral / liquidación</div><div class="desglose-sub">→ Suma al total del proceso</div></div><div class="desglose-val warning">${cop(extra)}</div></div>` : ''}
+      </div>
+      <div class="divider"></div>
+      <div class="total-row">
+        <div class="total-lbl">TOTAL A COBRAR ${iva?'<small>(IVA incluido)</small>':''}</div>
+        <div class="total-val">${cop(total)}</div>
+      </div>
+    </div>
+
+    <div class="fin-card">
+      <div class="card-title">Plan de financiamiento</div>
+      <div class="field">
+        <div class="slider-row">
+          <label class="label">Número de cuotas <span>(máx. ${lim})</span></label>
+          <div class="slider-val">${nc}</div>
+        </div>
+        <input type="range" min="1" max="${lim}" value="${nc}" oninput="setCuotas(parseInt(this.value))"/>
+        <div class="slider-ticks">${ticksHtml}</div>
+      </div>
+      <div class="field">
+        <div class="anticipo-info">
+          <label class="label" style="margin-bottom:0">Anticipo (cuota 1)</label>
+          <span class="anticipo-min">Mínimo: ${cop(minimoAnticipo)}</span>
+        </div>
+        <div class="input-wrap" style="margin-top:8px">
+          <span class="input-prefix">$</span>
+          <input type="text" id="anticipo-input" inputmode="numeric"
+            placeholder="${Math.round(minimoAnticipo).toLocaleString('es-CO')}"
+            value="${state.anticipoInput}"
+            oninput="setAnticipo(this.value)"
+            class="${anticipoValido?'':'error'}"/>
+        </div>
+        ${!anticipoValido ? `<div class="input-hint err">⚠️ El anticipo no puede ser menor al mínimo (${cop(minimoAnticipo)})</div>` : ''}
+        <div class="info-box">${extra>0?'Mínimo = 20% de (Lidera + adicional)':'Mínimo = 20% de Lidera'} · Puedes ingresar un valor mayor</div>
+      </div>
+      <div class="cuotas">${cuotasHtml}</div>
+      <div class="divider"></div>
+      <div class="fin-total">
+        <span class="fin-total-lbl">Total financiado en ${nc} cuota${nc>1?'s':''}</span>
+        <span class="fin-total-val">${cop(total)}</span>
+      </div>
+    </div>
+
+    <!-- RESUMEN EJECUTIVO -->
+    <div style="border-radius:20px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,0.6),0 0 0 1px rgba(255,255,255,0.06);">
+      <div style="background:linear-gradient(135deg,#0d0a1f 0%,#13103a 60%,#0d0a1f 100%);padding:22px 28px 20px;border-bottom:1px solid rgba(255,255,255,0.07);position:relative;overflow:hidden;">
+        <div style="position:absolute;top:-50px;right:-50px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(168,85,247,0.14) 0%,transparent 70%);pointer-events:none;"></div>
+        <div style="position:absolute;bottom:-40px;left:-30px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(79,70,229,0.1) 0%,transparent 70%);pointer-events:none;"></div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;position:relative;">
+          <div>
+            <div style="font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,0.3);font-weight:700;margin-bottom:6px;">Propuesta Comercial</div>
+            <div style="font-size:22px;font-weight:800;letter-spacing:-0.5px;background:linear-gradient(90deg,#e2d9f3,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1.1;">AVANZAR</div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:3px;letter-spacing:0.3px;">Insolvencia Persona Natural · Ley 2445/2025</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.25);margin-bottom:4px;">Tabla</div>
+            <div style="font-size:12px;font-weight:700;color:#c084fc;">${res.tabla}</div>
+            ${iva ? '<div style="margin-top:6px;padding:3px 8px;border-radius:20px;background:rgba(168,85,247,0.15);border:1px solid rgba(168,85,247,0.28);font-size:10px;color:#c084fc;font-weight:600;display:inline-block;">IVA 19% incluido</div>' : ''}
+          </div>
+        </div>
+      </div>
+      <div style="background:#0f0c22;padding:22px 28px;">
+        <div style="background:linear-gradient(135deg,rgba(124,58,237,0.18),rgba(79,70,229,0.12));border:1px solid rgba(124,58,237,0.3);border-radius:14px;padding:18px 22px;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.3);font-weight:700;margin-bottom:4px;">Inversión total${iva?' (IVA incl.)':''}</div>
+            <div style="font-size:11px;color:rgba(167,139,250,0.6);">${res.nota||'Proceso de insolvencia'}</div>
+          </div>
+          <div style="font-size:30px;font-weight:800;letter-spacing:-1px;background:linear-gradient(90deg,#c084fc,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">${cop(total)}</div>
+        </div>
+        <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.25);font-weight:700;margin-bottom:10px;">Desglose de servicios</div>
+        <table style="width:100%;border-collapse:collapse;margin-bottom:18px;">
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+            <td style="padding:9px 0;font-size:12px;color:rgba(255,255,255,0.55);">Centro de Conciliación <span style="font-size:10px;color:rgba(255,255,255,0.25);">(FLM / Nuvakta)</span></td>
+            <td style="padding:9px 0;font-size:13px;font-weight:700;color:rgba(255,255,255,0.8);text-align:right;font-variant-numeric:tabular-nums;">${cop(nuvakta)}</td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+            <td style="padding:9px 0;font-size:12px;color:rgba(255,255,255,0.55);">Acompañamiento Jurídico <span style="font-size:10px;color:rgba(255,255,255,0.25);">(Prosperar)</span></td>
+            <td style="padding:9px 0;font-size:13px;font-weight:700;color:rgba(255,255,255,0.8);text-align:right;font-variant-numeric:tabular-nums;">${cop(prosperar)}</td>
+          </tr>
+          <tr style="${extra>0?'border-bottom:1px solid rgba(255,255,255,0.05);':''}">
+            <td style="padding:9px 0;font-size:12px;color:rgba(192,132,252,0.8);">Paquete Educativo <span style="font-size:10px;color:rgba(192,132,252,0.45);">(Lidera)</span></td>
+            <td style="padding:9px 0;font-size:13px;font-weight:700;color:#c084fc;text-align:right;font-variant-numeric:tabular-nums;">${cop(lidera)}</td>
+          </tr>
+          ${extra>0?`<tr><td style="padding:9px 0;font-size:12px;color:rgba(245,158,11,0.75);">Adicional bilateral / liquidación</td><td style="padding:9px 0;font-size:13px;font-weight:700;color:#f59e0b;text-align:right;font-variant-numeric:tabular-nums;">${cop(extra)}</td></tr>`:''}
+        </table>
+        <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.25);font-weight:700;margin-bottom:10px;">Plan de pago · ${nc} cuota${nc>1?'s':''}</div>
+        <div style="display:grid;gap:5px;margin-bottom:20px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-radius:9px;background:rgba(129,140,248,0.12);border:1px solid rgba(129,140,248,0.28);">
+            <span style="font-size:12px;color:#a5b4fc;font-weight:600;">Anticipo &nbsp;<span style="font-weight:400;opacity:.6;">(Cuota 1)</span></span>
+            <span style="font-size:14px;font-weight:800;color:#c7d2fe;font-variant-numeric:tabular-nums;">${cop(anticipo)}</span>
+          </div>
+          ${nc>1?`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-radius:9px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);">
+            <span style="font-size:12px;color:rgba(255,255,255,0.45);">Cuotas 2 a ${nc} &nbsp;<span style="opacity:.6;">(${nc-1} pagos iguales)</span></span>
+            <span style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.75);font-variant-numeric:tabular-nums;">${cop(valorCuota)} c/u</span>
+          </div>`:''}
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding-top:16px;border-top:1px solid rgba(255,255,255,0.06);">
+          <div style="font-size:10px;color:rgba(255,255,255,0.18);line-height:1.7;max-width:60%;">
+            Expertos en insolvencia persona natural.<br>
+            Ley 2445 de 2025 · Colombia.
+          </div>
+          <button class="copy-btn" id="copy-btn" onclick="copiarResumen()">📋 Copiar resumen</button>
+        </div>
+      </div>
+    </div>
+    <pre id="resumen-pre" style="display:none">${resumenTexto}</pre>
+  `;
+}
+
+function toggleIva() { state.conIva = !state.conIva; render(); }
+function setCuotas(n) { state.numCuotas = n; render(); }
+function setAnticipo(val) {
+  const raw = val.replace(/[^0-9]/g, '');
+  state.anticipoInput = raw ? parseInt(raw).toLocaleString('es-CO') : '';
+  render();
+  const el = document.getElementById('anticipo-input');
+  if (el) { el.value = state.anticipoInput; el.focus(); }
+}
+function copiarResumen() {
+  const pre = document.getElementById('resumen-pre');
+  if (!pre) return;
+  const txt = pre.textContent;
+  const btn = document.getElementById('copy-btn');
+  const ok = () => { btn.textContent = '✓ Copiado'; btn.classList.add('ok'); setTimeout(() => { btn.textContent = '📋 Copiar resumen'; btn.classList.remove('ok'); }, 2200); };
+  if (navigator.clipboard) { navigator.clipboard.writeText(txt).then(ok).catch(() => fallback(txt, ok)); }
+  else fallback(txt, ok);
+}
+function fallback(txt, cb) {
+  const ta = document.createElement('textarea');
+  ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try { document.execCommand('copy'); cb(); } catch(e){}
+  document.body.removeChild(ta);
+}
+
+// INIT
+const sel = document.getElementById('select-ciudad');
+Object.keys(CIUDAD_GRUPO).sort().forEach(c => {
+  const o = document.createElement('option'); o.value = c; o.textContent = c; sel.appendChild(o);
+});
+document.querySelectorAll('.chip[data-group]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const g = btn.dataset.group, v = btn.dataset.val;
+    document.querySelectorAll(`.chip[data-group="${g}"]`).forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    if (g === 'ocupacion') state.ocupacion = v;
+    if (g === 'patrimonio') state.patrimonio = v;
+    if (g === 'objetivo') state.objetivo = v;
+    state.numCuotas = 1; state.anticipoInput = '';
+    render();
+  });
+});
+sel.addEventListener('change', () => { state.ciudad = sel.value; state.numCuotas = 1; state.anticipoInput = ''; render(); });
+document.getElementById('input-deuda').addEventListener('input', function() {
+  const raw = this.value.replace(/[^0-9]/g, '');
+  state.deuda = parseInt(raw) || 0;
+  this.value = raw ? parseInt(raw).toLocaleString('es-CO') : '';
+  document.getElementById('hint-deuda').textContent = state.deuda > 0 ? '$ ' + state.deuda.toLocaleString('es-CO') : '';
+  state.numCuotas = 1; state.anticipoInput = '';
+  render();
+});
+</script>
+</body>
+</html>
